@@ -1,6 +1,5 @@
 import facebook
 from tinydb import TinyDB, Query
-from message import Message
 import config_with_yaml as config
 
 class FacebookPub:
