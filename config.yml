@@ -1,0 +1,8 @@
+Publishers:
+  Facebook:
+    ParentObject: '177117995681773'
+    AccessToken: 'xxxxxxxxxxxxxxxx'
+
+Sources:
+  ED:
+    Cities: ['Banatsko Veliko Selo', 'Kikinda']
