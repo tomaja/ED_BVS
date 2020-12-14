@@ -5,7 +5,6 @@ from bs4 import BeautifulSoup
 class ElektrodistribucijaSrc:
     def __init__(self, appConfig, url = '') -> None:
         self.url = url
-        self.city = appConfig.getProperty('Sources.ED.City').lower()
         self.cities = appConfig.getProperty('Sources.ED.Cities')
         print("Elektrodistribucija source created for: " , repr(appConfig.getProperty('Sources.ED.Cities')))
 
