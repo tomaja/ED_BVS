@@ -13,7 +13,7 @@ class ElektrodistribucijaSrc:
 
     def GetDateLinks(self):
         with urllib.request.urlopen(self.url) as fp:
-            self.soupMainPage = BeautifulSoup(fp, 'lxml')
+            self.soupMainPage = BeautifulSoup(fp, 'html.parser')
         linkEls = self.soupMainPage.find('div', class_ = 'content_body_left').find_all("a", href=self.StartsWithSl)
         links = []
         for linkEl in linkEls:
@@ -22,7 +22,7 @@ class ElektrodistribucijaSrc:
 
     def GetMessage(self, link):        
         with urllib.request.urlopen(link) as fp:
-            bs = BeautifulSoup(fp, 'lxml')
+            bs = BeautifulSoup(fp, 'html.parser')
         tbody = bs.find('div', class_ = 'content_body_left').tbody
         trs = tbody.find_all('tr')
         message = {}
