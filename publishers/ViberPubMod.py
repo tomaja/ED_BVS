@@ -10,6 +10,7 @@ from viberbot.api.viber_requests import ViberSubscribedRequest
 from viberbot.api.viber_requests import ViberUnsubscribedRequest
 from viberbot.api.event_type import EventType
 from tinydb import TinyDB, Query
+import re
 
 import time
 import logging
@@ -74,17 +75,42 @@ class ViberPub:
         return Response(status=200)
 
     def set_webhook(self, viber):
-        self.viber.set_webhook('https://e6734b2c3d40.ngrok.io')
-        
+        self.viber.set_webhook('https://0b7772ddab6b.ngrok.io')
+    
+    def FormatMessage(self, rawMessages):
+        res = 'Automatsko obaveštenje o najavljenim prekidima snabdevanja električnom energijom u Banatskom Velikom Selu i okolini\n\n'
+
+        for rawMessage in rawMessages:
+            common_desc = rawMessage['common_desc']
+            common_desc = ' '.join(common_desc.split('\\t'))
+            common_desc = ' '.join(common_desc.split('\n'))
+            common_desc = ' '.join(common_desc.split('\t'))
+            common_desc = ' '.join(common_desc.split())
+            common_desc = common_desc.replace('\xa0', ' ')
+            res = res + common_desc + '\n'
+            for rawMessageDesc in rawMessage['desc']:
+                pretty = ' '.join(rawMessageDesc.split('\\n')).replace('\xa0', ' ')
+                pretty = ' '.join(pretty.split('\\t'))
+                pretty = ' '.join(pretty.split('\n'))
+                pretty = ' '.join(pretty.split('\t'))
+                pretty = ' '.join(pretty.split('\\'))
+                pretty = ' '.join(pretty.split())
+                pretty = re.sub(r'\b[0-9]\\\.', '', pretty)
+                pretty = re.sub(r'[0-9]\\\.', '', pretty)
+                res = res + ' ' + pretty + '\n'
+            # res = res + '[Elektrodistribucija](' + rawMessage['url'] + ')'
+            res = res + '\n'
+        return res
+
     def Publish(self, message) -> None:
         if len(self.db.search(self.query.hash == message.hash)) > 0:
             print('Already published to Viber')
         else:
             try:
-                print('Posting to Viber...' + message.message)
-                self.viber.send_messages('/qNmzm5H8vXHIuuJAmJZvw==', [ TextMessage(text=message.message) ])
+                print('Posting to Viber...' + self.FormatMessage(message.message))
+                self.viber.send_messages('/qNmzm5H8vXHIuuJAmJZvw==', [ TextMessage(text=self.FormatMessage(message.message)) ])
+                self.db.insert(message.ToDict())
             except:
                 print('Posting to Viber failed')
-            self.db.insert(message.ToDict())
         
 

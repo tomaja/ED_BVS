@@ -39,7 +39,7 @@ class TelegramPub:
 
     def Publish(self, message) -> None:
         if len(self.db.search(self.query.hash == message.hash)) > 0:
-            print('Already published')
+            print('Already published to Telegram')
             print(self.FormatMessage(message.message))
         else:
             try:

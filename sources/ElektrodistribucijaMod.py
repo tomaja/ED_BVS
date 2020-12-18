@@ -36,24 +36,11 @@ class ElektrodistribucijaSrc:
                     if city.lower() in cityLowercase:
                         message['desc'].append(tr.text)
         if len(message['desc']) > 0:
+            message['url'] = link
             return message
         else:
             return {}
 
-
-    def Prettify(self, rawMessages):
-        res = 'Automatsko obaveštenje o nestanku struje u selu i okolini:\n\n'
-        for rawMessage in rawMessages:
-            res = res + rawMessage['common_desc'] + '\n'
-            for rawMessageDesc in rawMessage['desc']:
-                pretty = ' '.join(rawMessageDesc.split('\\n'))
-                pretty = ' '.join(pretty.split('\\t'))
-                pretty = ' '.join(pretty.split('\n'))
-                pretty = ' '.join(pretty.split('\t'))
-                pretty = ' '.join(pretty.split(' '))
-                res = res + pretty + '\n'
-            res = res + '\n'
-        return res
 
     def GetRelevantMessages(self):
         links = self.GetDateLinks()
@@ -62,7 +49,8 @@ class ElektrodistribucijaSrc:
             msg = self.GetMessage(link)
             if len(msg) > 1:
                 rawMessages.append(msg)
-        return self.Prettify(rawMessages)
+        rawMessages.reverse()
+        return rawMessages
 
     def AcquireMessages(self):
 

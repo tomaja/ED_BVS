@@ -10,7 +10,7 @@ class Message:
         self.md5 = hashlib.md5()
         
     def Hash(self):
-        self.md5.update(repr(repr(self.message) + self.link).encode('utf-8'))
+        self.md5.update((repr(self.message) + self.link).encode('utf-8'))
         return self.md5.hexdigest()
 
     def ToDict(self):
