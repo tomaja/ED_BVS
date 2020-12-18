@@ -8,7 +8,11 @@ import config_with_yaml as config
 def PublishMessage(entry, publisher):
     publisher.Publish(entry)
 
-appConfig = config.load('config.yml')
+if len(sys.argv) > 1:
+    appConfig = config.load('config.yml')
+else:
+    appConfig = config.load(sys.argv[1])
+
 allPublishers = []
 allPublishers.append(FacebookPub(appConfig, 'fb_db.json'))
 allPublishers.append(TelegramPub(appConfig, 'tg_db.json'))
