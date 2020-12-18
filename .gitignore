@@ -1,5 +1,7 @@
 config.yml
 .vscode/settings.json
-fb_db.json
 .vscode/launch.json
+fb_db.json
+tg_db.json
+vb_db.json
 __pycache__

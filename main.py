@@ -1,5 +1,7 @@
 
 from publishers.FacebookPubMod import FacebookPub
+from publishers.TelegramPubMod import TelegramPub
+from publishers.ViberPubMod import ViberPub
 from sources.ElektrodistribucijaMod import ElektrodistribucijaSrc
 import config_with_yaml as config
 
@@ -9,6 +11,8 @@ def PublishMessage(entry, publisher):
 appConfig = config.load('config.yml')
 allPublishers = []
 allPublishers.append(FacebookPub(appConfig, 'fb_db.json'))
+allPublishers.append(TelegramPub(appConfig, 'tg_db.json'))
+allPublishers.append(ViberPub(appConfig, 'vb_db.json'))
 
 allSources = []
 allSources.append(ElektrodistribucijaSrc(appConfig, 'http://www.elektrovojvodina.rs/sl/mediji/ED-Zrenjanin123'))

@@ -1,0 +1,11 @@
+Publishers:
+  Facebook:
+    ParentObject: '123456789012'
+    AccessToken: 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
+  Telegram:
+    Token: 'xxxxxxxxxx:xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
+    ChatId: '@chatName'
+
+Sources:
+  ED:
+    Cities: ['Banatsko Veliko Selo', 'Kikinda']
