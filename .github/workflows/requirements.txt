@@ -1,0 +1,1 @@
+beautifulsoup4 config_with_yaml facebook-sdk tinydb flake8 flask viberbot
