@@ -4,14 +4,15 @@ from publishers.TelegramPubMod import TelegramPub
 from publishers.ViberPubMod import ViberPub
 from sources.ElektrodistribucijaMod import ElektrodistribucijaSrc
 import config_with_yaml as config
+import sys
 
 def PublishMessage(entry, publisher):
     publisher.Publish(entry)
 
 if len(sys.argv) > 1:
-    appConfig = config.load('config.yml')
-else:
     appConfig = config.load(sys.argv[1])
+else:
+    appConfig = config.load('config.yml')
 
 allPublishers = []
 allPublishers.append(FacebookPub(appConfig, 'fb_db.json'))
