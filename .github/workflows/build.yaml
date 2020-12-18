@@ -19,7 +19,7 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install beautifulsoup4 config_with_yaml facebook-sdk tinydb flake8 viberbot flask
+        pip install beautifulsoup4 config_with_yaml facebook-sdk tinydb flake8 viberbot flask logging
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
     - name: Lint with flake8
       run: |
