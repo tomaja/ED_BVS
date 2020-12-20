@@ -13,6 +13,9 @@ class TelegramPub:
         self.db = TinyDB(dbName)
         self.query = Query()
         print("Telegram publisher created.")
+    
+    def __del__(self):
+        self.db.close()
 
     def FormatMessage(self, rawMessages):
         res = '*Automatsko obaveštenje o najavljenim prekidima snabdevanja električnom energijom u Banatskom Velikom Selu i okolini*\n\n'

@@ -10,7 +10,11 @@ class FacebookPub:
         print("Facebook publisher created.")
         self.parent_object = self.config.getProperty('Publishers.Facebook.ParentObject')
         self.access_token = self.config.getProperty('Publishers.Facebook.AccessToken')
-
+    
+    def __del__(self):
+        self.db.close()
+  
+    
     def FormatMessage(self, rawMessages):
         res = 'Automatsko obaveštenje o nestanku struje u selu i okolini:\n\n'
         for rawMessage in rawMessages:
@@ -42,3 +46,5 @@ class FacebookPub:
             except:
                 print('Posting to FB failed')
             self.db.insert(message.ToDict())
+
+

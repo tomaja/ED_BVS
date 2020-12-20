@@ -40,6 +40,9 @@ class ViberPub:
         t_webApp.setDaemon(True)
         t_webApp.start()
         print("Viber publisher created.")
+    
+    def __del__(self):
+        self.db.close()
         
     def flaskThread(self):
         self.app.run(host='0.0.0.0', port=80, debug=False)
