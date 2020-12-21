@@ -53,7 +53,6 @@ class ElektrodistribucijaSrc:
         return rawMessages
 
     def AcquireMessages(self):
-
         messages = []
         message = Message()
         message.message = self.GetRelevantMessages()
