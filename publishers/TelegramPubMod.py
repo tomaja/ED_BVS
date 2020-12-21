@@ -43,11 +43,9 @@ class TelegramPub:
     def Publish(self, message) -> None:
         if len(self.db.search(self.query.hash == message.hash)) > 0:
             print('Already published to Telegram')
-            print(self.FormatMessage(message.message))
         else:
             try:
                 print('Posting to Telegram...' + self.FormatMessage(message.message))
-                #self.bot.sendMessage(self.chat_id, "*bold* _italic_ `fixed width font` [link](http://google.com)\.", ParseMode.MARKDOWN_V2)
                 self.bot.sendMessage(self.chat_id, self.FormatMessage(message.message), parse_mode=ParseMode.MARKDOWN_V2)
                 self.db.insert(message.ToDict())
             except:

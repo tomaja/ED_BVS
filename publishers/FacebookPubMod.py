@@ -31,7 +31,7 @@ class FacebookPub:
 
     def Publish(self, message) -> None:
         if len(self.db.search(self.query.hash == message.hash)) > 0:
-            print('Already published')
+            print('Already published to Facebook')
         else:
             try:
                 print('Posting to FB...' + self.FormatMessage(message.message))
