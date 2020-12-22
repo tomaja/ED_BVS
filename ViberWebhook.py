@@ -30,7 +30,7 @@ class ViberWebhook:
         self.config = appConfig
         self.viber = Api(BotConfiguration(
             name = self.config.getProperty('Publishers.Viber.Name'),
-            avatar = self.config.getProperty('Publishers.Viber.Token'),
+            avatar = self.config.getProperty('Publishers.Viber.Avatar'),
             auth_token = self.config.getProperty('Publishers.Viber.Token')
         ))
         self.query = Query()
@@ -44,7 +44,7 @@ class ViberWebhook:
         self.app.add_url_rule('/', 'incoming', self.incoming, methods=['POST'])
         self.t_webApp = threading.Thread(target=self.flaskThread)
         self.t_webApp.setDaemon(True)
-        #self.t_webApp.start()
+        
         print("Viber worker created.")
     
     def __del__(self):

@@ -25,7 +25,7 @@ class ViberPub:
         self.config = appConfig
         self.viber = Api(BotConfiguration(
             name = self.config.getProperty('Publishers.Viber.Name'),
-            avatar = self.config.getProperty('Publishers.Viber.Token'),
+            avatar = '',
             auth_token = self.config.getProperty('Publishers.Viber.Token')
         ))
         self.query = Query()
