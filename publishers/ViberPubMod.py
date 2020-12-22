@@ -20,6 +20,7 @@ import threading
 class ViberPub:
     def __init__(self, appConfig, dbName = 'vb_db.json') -> None:
         self.db = TinyDB(dbName)
+        self.usersDb = TinyDB('vb_users.json')
         self.app = Flask(__name__)
         self.config = appConfig
         self.viber = Api(BotConfiguration(
@@ -28,58 +29,12 @@ class ViberPub:
             auth_token = self.config.getProperty('Publishers.Viber.Token')
         ))
         self.query = Query()
-        
-        ## Delayed webhook setup
-        scheduler = sched.scheduler(time.time, time.sleep)
-        scheduler.enter(5, 1, self.set_webhook, (self.viber,))
-        t = threading.Thread(target=scheduler.run)
-        t.start()
-
-        self.app.add_url_rule('/', 'incoming', self.incoming, methods=['POST'])
-        t_webApp = threading.Thread(target=self.flaskThread)
-        t_webApp.setDaemon(True)
-        t_webApp.start()
         print("Viber publisher created.")
     
     def __del__(self):
         self.db.close()
-        
-    def flaskThread(self):
-        self.app.run(host='0.0.0.0', port=80, debug=False)
-
-    def incoming(self):
-        print('------------------------------------------------------------------------')
-        print(request.path)
-
-        viber_request = self.viber.parse_request(request.get_data().decode('utf8'))
-
-        ## ID korisnika mora da se upiše u bazu i onda da se šalju obaveštenja
-        type = viber_request.event_type
-        print('------------------------------------------------------------------------')
-        print(repr(type))
-        if type == EventType.MESSAGE:
-            self.viber.send_messages('/qNmzm5H8vXHIuuJAmJZvw==', [ TextMessage(text='Neko piše...') ])
-        
-        if isinstance(viber_request, ViberMessageRequest):
-            message = viber_request.message
-            self.viber.send_messages(viber_request.sender.id, [
-                message
-            ])
-        elif isinstance(viber_request, ViberConversationStartedRequest) \
-                or isinstance(viber_request, ViberSubscribedRequest) \
-                or isinstance(viber_request, ViberUnsubscribedRequest):
-            self.viber.send_messages(viber_request.sender.id, [
-                TextMessage(None, None, viber_request.get_event_type())
-            ])
-        elif isinstance(viber_request, ViberFailedRequest):
-            logger.warn("client failed receiving message. failure: {0}".format(viber_request))
-
-        # print(' ---------------------------------------- ID:' + viber_request.sender.id)
-        return Response(status=200)
-
-    def set_webhook(self, viber):
-        self.viber.set_webhook('https://0b7772ddab6b.ngrok.io')
-    
+        self.usersDb.close()
+            
     def FormatMessage(self, rawMessages):
         res = 'Automatsko obaveštenje o najavljenim prekidima snabdevanja električnom energijom u Banatskom Velikom Selu i okolini\n\n'
 
@@ -101,7 +56,6 @@ class ViberPub:
                 pretty = re.sub(r'\b[0-9]\\\.', '', pretty)
                 pretty = re.sub(r'[0-9]\\\.', '', pretty)
                 res = res + ' ' + pretty + '\n'
-            # res = res + '[Elektrodistribucija](' + rawMessage['url'] + ')'
             res = res + '\n'
         return res
 
@@ -111,7 +65,9 @@ class ViberPub:
         else:
             try:
                 print('Posting to Viber...' + self.FormatMessage(message.message))
-                self.viber.send_messages('/qNmzm5H8vXHIuuJAmJZvw==', [ TextMessage(text=self.FormatMessage(message.message)) ])
+                UserQ = Query()
+                for user in self.usersDb.search(UserQ.active == '1'):
+                    self.viber.send_messages(user['id'], [ TextMessage(text=self.FormatMessage(message.message)) ])
                 self.db.insert(message.ToDict())
             except:
                 print('Posting to Viber failed')
