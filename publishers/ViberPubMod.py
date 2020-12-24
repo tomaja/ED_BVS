@@ -60,16 +60,19 @@ class ViberPub:
         return res
 
     def Publish(self, message) -> None:
-        if len(self.db.search(self.query.hash == message.hash)) > 0:
-            print('Already published to Viber')
-        else:
-            try:
-                print('Posting to Viber...' + self.FormatMessage(message.message))
-                UserQ = Query()
-                for user in self.usersDb.search(UserQ.active == '1'):
-                    self.viber.send_messages(user['id'], [ TextMessage(text=self.FormatMessage(message.message)) ])
-                self.db.insert(message.ToDict())
-            except:
-                print('Posting to Viber failed')
+        try:
+            print('Posting to Viber...' + self.FormatMessage(message.message))
+            UserQ = Query()
+            for user in self.usersDb.search(UserQ.active == '1'):
+                messageCopy = message
+                messageCopy.userId = user['id']
+                if len(self.db.search((self.query.hash == messageCopy.hash) & (self.query.userId == user['id']))) == 0:
+                    self.viber.send_messages(user['id'], [ TextMessage(text=self.FormatMessage(messageCopy.message)) ])
+                    self.db.insert(messageCopy.ToDict())
+                    print('Message sent to Viber user: ' + user['name'])
+                else:
+                    print('User ' + user['name'] + ' already notified through Viber')
+        except:
+            print('Posting to Viber failed')
         
 
