@@ -30,7 +30,7 @@ class ViberWebhook:
         self.config = appConfig
         self.viber = Api(BotConfiguration(
             name = self.config.getProperty('Publishers.Viber.Name'),
-            avatar = self.config.getProperty('Publishers.Viber.Avatar'),
+#            avatar = self.config.getProperty('Publishers.Viber.Avatar'),
             auth_token = self.config.getProperty('Publishers.Viber.Token')
         ))
         self.query = Query()
@@ -82,7 +82,7 @@ class ViberWebhook:
             self.viber.send_messages(viber_request.user.id, [ TextMessage(text='Uspešna prijava. Pošalji STOP za odjavu') ])
         elif isinstance(viber_request, ViberSubscribedRequest):
             UserQ = Query()
-            self.viber.send_messages(viber_request.user.id, [ TextMessage(text='Uspešna prijava. Odjava u meniju ili slanjem poruke STOP') ])
+            self.viber.send_messages(viber_request.user.id, [ TextMessage(text='Za prijavu pošaljite bilo kakvu poruku. Odjava u meniju ili slanjem poruke STOP') ])
             if len(self.usersDb.search(UserQ.id == viber_request.user.id)) == 0:
                 self.usersDb.insert({'id': viber_request.user.id, 'name': viber_request.user.name, 'active': '1'})
             else:
