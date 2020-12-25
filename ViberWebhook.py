@@ -30,7 +30,7 @@ class ViberWebhook:
         self.config = appConfig
         self.viber = Api(BotConfiguration(
             name = self.config.getProperty('Publishers.Viber.Name'),
-#            avatar = self.config.getProperty('Publishers.Viber.Avatar'),
+            avatar = self.config.getProperty('Publishers.Viber.Avatar'),
             auth_token = self.config.getProperty('Publishers.Viber.Token')
         ))
         self.query = Query()
