@@ -61,20 +61,21 @@ class ViberPub:
         return res
 
     def Publish(self, message) -> None:
-        print('Posting to Viber...' + self.FormatMessage(message.message))
-        UserQ = Query()
-        for user in self.usersDb.search(UserQ.active == '1'):
-            messageCopy = copy.copy(message)
-            messageCopy.userId = user['id']
-            if len(self.db.search((self.query.hash == messageCopy.hash) & (self.query.userId == user['id']))) == 0:
-                try:
-                    self.viber.send_messages(user['id'], [ TextMessage(text=self.FormatMessage(messageCopy.message)) ])
-                    messageCopy.message = ''
-                    self.db.insert(messageCopy.ToDict())
-                    print('Message sent to Viber user: ' + user['name'])
-                except Exception as e:
-                    print('Posting to Viber user {0} -> {1}'.format(user['name'], e))
-            else:
-                print('User ' + user['name'] + ' already notified through Viber')
+        if len(message.message) > 0:
+            print('Posting to Viber...' + self.FormatMessage(message.message))
+            UserQ = Query()
+            for user in self.usersDb.search(UserQ.active == '1'):
+                messageCopy = copy.copy(message)
+                messageCopy.userId = user['id']
+                if len(self.db.search((self.query.hash == messageCopy.hash) & (self.query.userId == user['id']))) == 0:
+                    try:
+                        self.viber.send_messages(user['id'], [ TextMessage(text=self.FormatMessage(messageCopy.message)) ])
+                        messageCopy.message = ''
+                        self.db.insert(messageCopy.ToDict())
+                        print('Message sent to Viber user: ' + user['name'])
+                    except Exception as e:
+                        print('Posting to Viber user {0} -> {1}'.format(user['name'], e))
+                else:
+                    print('User ' + user['name'] + ' already notified through Viber')
         
 
