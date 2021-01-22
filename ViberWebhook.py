@@ -72,7 +72,8 @@ class ViberWebhook:
                         self.usersDb.insert({'id': viber_request.sender.id, 'name': viber_request.sender.name, 'active': '1'})
                     else:
                         self.usersDb.update({'active': '1'}, UserQ.id == viber_request.sender.id)
-                    self.viber.send_messages(viber_request.sender.id, [ TextMessage(text='Uspešna prijava! Pošalji STOP za odjavu.') ])
+                    self.viber.send_messages(viber_request.sender.id, [ TextMessage(text = 'Uspešna prijava! Pošalji STOP za odjavu.') ])
+                    self.viber.send_messages("/qNmzm5H8vXHIuuJAmJZvw==", [ TextMessage(text = 'Novi korisnik: ' + viber_request.sender.name) ])
         elif isinstance(viber_request, ViberConversationStartedRequest):
             UserQ = Query()
             #self.viber.send_messages(viber_request.user.id, [ TextMessage(text='Za prijavu pošaljite bilo kakvu poruku.') ])
