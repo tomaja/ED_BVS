@@ -82,7 +82,7 @@ class ViberWebhook:
                     self.usersDb.update({'active': '0'}, UserQ.id == viber_request.sender.id)
                 else:
                     if len(self.usersDb.search(UserQ.id == viber_request.sender.id)) == 0:
-                        self.usersDb.insert({'id': viber_request.sender.id, 'name': viber_request.sender.name, 'active': '1'})
+                        self.usersDb.insert({'id': viber_request.sender.id, 'name': viber_request.sender.name, 'active': '1', 'admin': '0'})
                     else:
                         self.usersDb.update({'active': '1'}, UserQ.id == viber_request.sender.id)
                     self.viber.send_messages(viber_request.sender.id, [ TextMessage(text = 'Uspešna prijava! Pošalji STOP za odjavu.') ])
@@ -92,14 +92,14 @@ class ViberWebhook:
             UserQ = Query()
             #self.viber.send_messages(viber_request.user.id, [ TextMessage(text='Za prijavu pošaljite bilo kakvu poruku.') ])
             if len(self.usersDb.search(UserQ.id == viber_request.user.id)) == 0:
-                self.usersDb.insert({'id': viber_request.user.id, 'name': viber_request.user.name, 'active': '1'})
+                self.usersDb.insert({'id': viber_request.user.id, 'name': viber_request.user.name, 'active': '1', 'admin': '0'})
             else:
                 self.usersDb.update({'active': '0'}, UserQ.id == viber_request.user.id)
         elif isinstance(viber_request, ViberSubscribedRequest):
             UserQ = Query()
             self.viber.send_messages(viber_request.user.id, [ TextMessage(text='Za prijavu pošaljite bilo kakvu poruku.') ])
             if len(self.usersDb.search(UserQ.id == viber_request.user.id)) == 0:
-                self.usersDb.insert({'id': viber_request.user.id, 'name': viber_request.user.name, 'active': '1'})
+                self.usersDb.insert({'id': viber_request.user.id, 'name': viber_request.user.name, 'active': '1', 'admin': '0'})
             else:
                 self.usersDb.update({'active': '1'}, UserQ.id == viber_request.user.id)
         elif isinstance(viber_request, ViberUnsubscribedRequest):
