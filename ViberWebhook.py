@@ -58,7 +58,7 @@ class ViberWebhook:
 
     def GetAdmins(self):
         UserQ = Query()
-        admins = self.usersDb.search(UserQ.admin == 1)
+        admins = self.usersDb.search(UserQ.admin == "1")
         return admins
 
     def NotifyAdmins(self, admins, message):
