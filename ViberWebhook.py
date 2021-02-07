@@ -57,10 +57,7 @@ class ViberWebhook:
         self.t_webApp.run()
 
     def GetAdmins(self):
-        UserQ = Query()
-        admins = self.usersDb.search(UserQ.admin == "1")
-        for admin in admins:
-            print(admin)
+        admins = self.usersDb.search(self.query.admin == '1')
         return admins
 
     def NotifyAdmins(self, admins, message):
@@ -68,9 +65,12 @@ class ViberWebhook:
             self.viber.send_messages(admin.id, [ TextMessage(text = message) ])   
 
     def incoming(self):
+        admins = self.GetAdmins()
+        print('---------------- ADMINS ------------------')
+        print(admins)
+
         print(request.path)
         viber_request = self.viber.parse_request(request.get_data().decode('utf8'))
-        admins = self.GetAdmins()
 
         if isinstance(viber_request, ViberMessageRequest):
             message = viber_request.message
@@ -87,7 +87,7 @@ class ViberWebhook:
                     else:
                         self.usersDb.update({'active': '1'}, UserQ.id == viber_request.sender.id)
                     self.viber.send_messages(viber_request.sender.id, [ TextMessage(text = 'Uspešna prijava! Pošalji STOP za odjavu.') ])
-                    #self.viber.send_messages("/qNmzm5H8vXHIuuJAmJZvw==", [ TextMessage(text = 'Novi korisnik: ' + viber_request.sender.name) ])
+                    self.viber.send_messages("/qNmzm5H8vXHIuuJAmJZvw==", [ TextMessage(text = 'Novi korisnik: ' + viber_request.sender.name) ])
                     #self.NotifyAdmins(admins, 'Novi korisnik: ' + viber_request.sender.name)
         elif isinstance(viber_request, ViberConversationStartedRequest):
             UserQ = Query()
