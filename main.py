@@ -16,9 +16,14 @@ else:
     appConfig = config.load('config.yml')
 
 allPublishers = []
-allPublishers.append(FacebookPub(appConfig, 'fb_db.json'))
-allPublishers.append(TelegramPub(appConfig, 'tg_db.json'))
-allPublishers.append(ViberPub(appConfig, 'vb_db.json'))
+if len(appConfig.getPropertyWithDefault('Publishers.Facebook', '')) > 0:
+    allPublishers.append(FacebookPub(appConfig, 'fb_db.json'))
+    
+if len(appConfig.getPropertyWithDefault('Publishers.Telegram', '')) > 0:
+    allPublishers.append(TelegramPub(appConfig, 'tg_db.json'))
+    
+if len(appConfig.getPropertyWithDefault('Publishers.Viber', '')) > 0:
+    allPublishers.append(ViberPub(appConfig, 'vb_db.json'))
 
 allSources = []
 allSources.append(ElektrodistribucijaSrc(appConfig, 'http://www.elektrovojvodina.rs/sl/mediji/ED-Zrenjanin123'))

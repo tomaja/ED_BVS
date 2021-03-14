@@ -7,6 +7,7 @@ class Message:
         self.image = None
         self.link = ''
         self.hash = ''
+        self.userId = ''
         self.md5 = hashlib.md5()
         
     def Hash(self):
@@ -19,4 +20,5 @@ class Message:
         d['image'] = self.image
         d['link'] = self.link
         d['hash'] = self.hash
+        d['userId'] = self.userId
         return d

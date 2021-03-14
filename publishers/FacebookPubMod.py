@@ -30,21 +30,23 @@ class FacebookPub:
         return res
 
     def Publish(self, message) -> None:
-        if len(self.db.search(self.query.hash == message.hash)) > 0:
-            print('Already published to Facebook')
-        else:
-            try:
-                print('Posting to FB...' + self.FormatMessage(message.message))
-                post = { 'message': self.FormatMessage(message.message), 'link': message.link }
-                graph = facebook.GraphAPI(access_token=self.access_token, version='3.1')
-                api_request = graph.put_object(
-                    parent_object=self.parent_object,
-                    connection_name='feed',
-                    message=post['message'],
-                    #link=post['link']
-                )
-            except:
-                print('Posting to FB failed')
-            self.db.insert(message.ToDict())
+        if len(message.message) > 0:
+            if len(self.db.search(self.query.hash == message.hash)) > 0:
+                print('Already published to Facebook')
+            else:
+                try:
+                    print('Posting to FB...' + self.FormatMessage(message.message))
+                    post = { 'message': self.FormatMessage(message.message), 'link': message.link }
+                    graph = facebook.GraphAPI(access_token=self.access_token, version='3.1')
+                    api_request = graph.put_object(
+                        parent_object=self.parent_object,
+                        connection_name='feed',
+                        message=post['message'],
+                        #link=post['link']
+                    )
+                except:
+                    print('Posting to FB failed')
+                self.db.insert(message.ToDict())
+            
 
 

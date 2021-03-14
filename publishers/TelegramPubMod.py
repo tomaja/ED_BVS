@@ -41,12 +41,14 @@ class TelegramPub:
         return res
 
     def Publish(self, message) -> None:
-        if len(self.db.search(self.query.hash == message.hash)) > 0:
-            print('Already published to Telegram')
-        else:
-            try:
-                print('Posting to Telegram...' + self.FormatMessage(message.message))
-                self.bot.sendMessage(self.chat_id, self.FormatMessage(message.message), parse_mode=ParseMode.MARKDOWN_V2)
-                self.db.insert(message.ToDict())
-            except:
-                print('Posting to Telegram failed')
+        if len(message.message) > 0:
+            if len(self.db.search(self.query.hash == message.hash)) > 0:
+                print('Already published to Telegram')
+            else:
+                try:
+                    print('Posting to Telegram...' + self.FormatMessage(message.message))
+                    self.bot.sendMessage(self.chat_id, self.FormatMessage(message.message), parse_mode=ParseMode.MARKDOWN_V2)
+                    self.db.insert(message.ToDict())
+                except:
+                    print('Posting to Telegram failed')
+                

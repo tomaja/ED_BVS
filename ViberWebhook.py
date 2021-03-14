@@ -30,7 +30,7 @@ class ViberWebhook:
         self.config = appConfig
         self.viber = Api(BotConfiguration(
             name = self.config.getProperty('Publishers.Viber.Name'),
-            avatar = self.config.getProperty('Publishers.Viber.Token'),
+            avatar = self.config.getProperty('Publishers.Viber.Avatar'),
             auth_token = self.config.getProperty('Publishers.Viber.Token')
         ))
         self.query = Query()
@@ -44,7 +44,7 @@ class ViberWebhook:
         self.app.add_url_rule('/', 'incoming', self.incoming, methods=['POST'])
         self.t_webApp = threading.Thread(target=self.flaskThread)
         self.t_webApp.setDaemon(True)
-        #self.t_webApp.start()
+        
         print("Viber worker created.")
     
     def __del__(self):
@@ -56,7 +56,19 @@ class ViberWebhook:
     def Run(self):
         self.t_webApp.run()
 
+    def GetAdmins(self):
+        admins = self.usersDb.search(self.query.admin == '1')
+        return admins
+
+    def NotifyAdmins(self, admins, message):
+        for admin in admins:
+            self.viber.send_messages(admin.id, [ TextMessage(text = message) ])   
+
     def incoming(self):
+        admins = self.GetAdmins()
+        print('---------------- ADMINS ------------------')
+        print(admins)
+
         print(request.path)
         viber_request = self.viber.parse_request(request.get_data().decode('utf8'))
 
@@ -65,26 +77,30 @@ class ViberWebhook:
             if isinstance(message, TextMessage):
                 print(message)
                 UserQ = Query()
+
+                # Handle standard requests
                 if message.text.strip().lower() == 'stop':
                     self.usersDb.update({'active': '0'}, UserQ.id == viber_request.sender.id)
                 else:
                     if len(self.usersDb.search(UserQ.id == viber_request.sender.id)) == 0:
-                        self.usersDb.insert({'id': viber_request.sender.id, 'name': viber_request.sender.name, 'active': '1'})
+                        self.usersDb.insert({'id': viber_request.sender.id, 'name': viber_request.sender.name, 'active': '1', 'admin': '0'})
                     else:
                         self.usersDb.update({'active': '1'}, UserQ.id == viber_request.sender.id)
-                    self.viber.send_messages(viber_request.sender.id, [ TextMessage(text='Pošalji STOP za odjavu') ])
+                    self.viber.send_messages(viber_request.sender.id, [ TextMessage(text = 'Uspešna prijava! Pošalji STOP za odjavu.') ])
+                    self.viber.send_messages("/qNmzm5H8vXHIuuJAmJZvw==", [ TextMessage(text = 'Novi korisnik: ' + viber_request.sender.name) ])
+                    #self.NotifyAdmins(admins, 'Novi korisnik: ' + viber_request.sender.name)
         elif isinstance(viber_request, ViberConversationStartedRequest):
             UserQ = Query()
+            #self.viber.send_messages(viber_request.user.id, [ TextMessage(text='Za prijavu pošaljite bilo kakvu poruku.') ])
             if len(self.usersDb.search(UserQ.id == viber_request.user.id)) == 0:
-                self.usersDb.insert({'id': viber_request.user.id, 'name': viber_request.user.name, 'active': '1'})
+                self.usersDb.insert({'id': viber_request.user.id, 'name': viber_request.user.name, 'active': '1', 'admin': '0'})
             else:
-                self.usersDb.update({'active': '1'}, UserQ.id == viber_request.user.id)
-            self.viber.send_messages(viber_request.user.id, [ TextMessage(text='Uspešna prijava. Pošalji STOP za odjavu') ])
+                self.usersDb.update({'active': '0'}, UserQ.id == viber_request.user.id)
         elif isinstance(viber_request, ViberSubscribedRequest):
             UserQ = Query()
-            self.viber.send_messages(viber_request.user.id, [ TextMessage(text='Uspešna prijava. Odjava u meniju ili slanjem poruke STOP') ])
+            self.viber.send_messages(viber_request.user.id, [ TextMessage(text='Za prijavu pošaljite bilo kakvu poruku.') ])
             if len(self.usersDb.search(UserQ.id == viber_request.user.id)) == 0:
-                self.usersDb.insert({'id': viber_request.user.id, 'name': viber_request.user.name, 'active': '1'})
+                self.usersDb.insert({'id': viber_request.user.id, 'name': viber_request.user.name, 'active': '1', 'admin': '0'})
             else:
                 self.usersDb.update({'active': '1'}, UserQ.id == viber_request.user.id)
         elif isinstance(viber_request, ViberUnsubscribedRequest):
