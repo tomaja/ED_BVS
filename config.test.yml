@@ -13,3 +13,5 @@ Publishers:
 Sources:
   ED:
     Cities: ['Banatsko Veliko Selo', 'Kikinda']
+  File:
+    Input: 'input.txt'

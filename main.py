@@ -3,6 +3,7 @@ from publishers.FacebookPubMod import FacebookPub
 from publishers.TelegramPubMod import TelegramPub
 from publishers.ViberPubMod import ViberPub
 from sources.ElektrodistribucijaMod import ElektrodistribucijaSrc
+from sources.FileInputMod import FileInputSrc
 import config_with_yaml as config
 import sys
 
@@ -21,6 +22,7 @@ allPublishers.append(ViberPub(appConfig, 'vb_db.json'))
 
 allSources = []
 allSources.append(ElektrodistribucijaSrc(appConfig, 'http://www.elektrovojvodina.rs/sl/mediji/ED-Zrenjanin123'))
+allSources.append(FileInputSrc(appConfig))
 
 allMessages = []
 for src in allSources:
