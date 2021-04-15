@@ -79,7 +79,13 @@ class ViberWebhook:
                     for user in self.usersDb.all():
                         usersListStr += user['name'] + '\n'
                     self.NotifyAdmins(admins, 'Korisnici: \n' + usersListStr)
-
+                    return Response(status=200)                    
+                else:
+                    if(message.text.strip() == "/ListAdmins"):
+                        for user in self.usersDb.search(self.query.admin == '1'):
+                            usersListStr += user['name'] + '\n'
+                        self.NotifyAdmins(admins, 'Administratori: \n' + usersListStr)
+                        return Response(status=200)
 
                 UserQ = Query()
 
