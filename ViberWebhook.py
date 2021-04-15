@@ -62,6 +62,8 @@ class ViberWebhook:
 
     def NotifyAdmins(self, admins, message):
         for admin in admins:
+            print('---------------- ADMIN ------------------')
+            print(admin)
             self.viber.send_messages(admin.id, [ TextMessage(text = message) ])   
 
     def incoming(self):
