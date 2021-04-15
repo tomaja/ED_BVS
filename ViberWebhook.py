@@ -67,16 +67,20 @@ class ViberWebhook:
     def incoming(self):
 
         admins = self.GetAdmins()
-        print('---------------- ADMINS ------------------')
-        print(admins)
-
         print(request.path)
         viber_request = self.viber.parse_request(request.get_data().decode('utf8'))
 
         if isinstance(viber_request, ViberMessageRequest):
             message = viber_request.message
             if isinstance(message, TextMessage):
-                print(message)
+                #print(message)
+                usersListStr = ''
+                if(message.text.strip() == "/ListUsers"):
+                    for user in self.usersDb.all():
+                        usersListStr += user['name'] + '\n'
+                    self.NotifyAdmins(admins, 'Korisnici: \n' + usersListStr)
+
+
                 UserQ = Query()
 
                 # Handle standard requests
