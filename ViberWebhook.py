@@ -42,6 +42,7 @@ class ViberWebhook:
         t.start()
 
         self.app.add_url_rule('/', 'incoming', self.incoming, methods=['POST'])
+        self.app.add_url_rule('/ctrl', '', self.control, methods=['POST', 'GET'])
         self.t_webApp = threading.Thread(target=self.flaskThread)
         self.t_webApp.setDaemon(True)
         
@@ -133,6 +134,12 @@ class ViberWebhook:
             logger.warn("client failed receiving message. failure: {0}".format(viber_request))
 
         return Response(status=200)
+
+
+    def control(self):
+        admins = self.GetAdmins()
+        #data = request.get_data().decode('utf8')
+        return Response(status=200, response='Serving Request: ' + request.path)
 
     def set_webhook(self, viber):
         self.viber.set_webhook(self.public_url)  
