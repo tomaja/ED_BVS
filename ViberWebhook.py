@@ -64,6 +64,9 @@ class ViberWebhook:
         for admin in admins:
             self.viber.send_messages(admin['id'], [ TextMessage(text = message) ])   
 
+    def IsAdmin(self, user_id, admins):
+        return next((admin for admin in admins if admin['id'] == user_id), None) != None
+
     def incoming(self):
 
         admins = self.GetAdmins()
@@ -73,19 +76,27 @@ class ViberWebhook:
         if isinstance(viber_request, ViberMessageRequest):
             message = viber_request.message
             if isinstance(message, TextMessage):
+
+                is_admin = self.IsAdmin(viber_request.sender.id, admins)
+                print("IsAdmin: " + is_admin)
+                
                 #print(message)
                 usersListStr = ''
-                if(message.text.strip() == "/ListUsers"):
+                if(message.text.strip() == "/ListUsers" and is_admin):
                     for user in self.usersDb.all():
                         usersListStr += user['name'] + '\n'
                     self.NotifyAdmins(admins, 'Korisnici: \n' + usersListStr)
-                    return Response(status=200)                    
+                    return Response(status=200)
                 else:
-                    if(message.text.strip() == "/ListAdmins"):
+                    if(message.text.strip() == "/ListAdmins" and is_admin):
                         for user in self.usersDb.search(self.query.admin == '1'):
                             usersListStr += user['name'] + '\n'
                         self.NotifyAdmins(admins, 'Administratori: \n' + usersListStr)
                         return Response(status=200)
+                    else:
+                        if(message.text.strip() == "/GetPublicURL" and is_admin):
+                            self.NotifyAdmins(admins, 'Javna adresa: \n' + self.public_url)
+                            return Response(status=200)
 
                 UserQ = Query()
 
