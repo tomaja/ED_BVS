@@ -94,7 +94,8 @@ class ViberWebhook:
             if isinstance(message, TextMessage):
 
                 is_admin = self.IsAdmin(viber_request.sender.id, admins)
-                print("IsAdmin: " + is_admin)
+                if is_admin:
+                    print("IsAdmin: True")
                 
                 ## HANDLE ADMIN REQUESTS
                 usersListStr = ''
