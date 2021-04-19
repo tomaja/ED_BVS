@@ -14,6 +14,7 @@ from pyngrok import ngrok
 import re
 import sys
 import config_with_yaml as config
+import socket
 
 import time
 import logging
@@ -68,6 +69,20 @@ class ViberWebhook:
     def IsAdmin(self, user_id, admins):
         return next((admin for admin in admins if admin['id'] == user_id), None) != None
 
+    def Reboot():
+        command = "/usr/bin/sudo /sbin/shutdown -r now"
+        import subprocess
+        process = subprocess.Popen(command.split(), stdout=subprocess.PIPE)
+        output = process.communicate()[0]
+        print(output)
+
+    def RestartViber():
+        command = "service Viber restart"
+        import subprocess
+        process = subprocess.Popen(command.split(), stdout=subprocess.PIPE)
+        output = process.communicate()[0]
+        print(output)
+
     def incoming(self):
 
         admins = self.GetAdmins()
@@ -81,23 +96,32 @@ class ViberWebhook:
                 is_admin = self.IsAdmin(viber_request.sender.id, admins)
                 print("IsAdmin: " + is_admin)
                 
-                #print(message)
+                ## HANDLE ADMIN REQUESTS
                 usersListStr = ''
                 if(message.text.strip() == "/ListUsers" and is_admin):
                     for user in self.usersDb.all():
                         usersListStr += user['name'] + '\n'
                     self.NotifyAdmins(admins, 'Korisnici: \n' + usersListStr)
+                    return Response(status=200)                
+                if(message.text.strip() == "/ListAdmins" and is_admin):
+                    for user in self.usersDb.search(self.query.admin == '1'):
+                        usersListStr += user['name'] + '\n'
+                    self.NotifyAdmins(admins, 'Administratori: \n' + usersListStr)
                     return Response(status=200)
-                else:
-                    if(message.text.strip() == "/ListAdmins" and is_admin):
-                        for user in self.usersDb.search(self.query.admin == '1'):
-                            usersListStr += user['name'] + '\n'
-                        self.NotifyAdmins(admins, 'Administratori: \n' + usersListStr)
-                        return Response(status=200)
-                    else:
-                        if(message.text.strip() == "/GetPublicURL" and is_admin):
-                            self.NotifyAdmins(admins, 'Javna adresa: \n' + self.public_url)
-                            return Response(status=200)
+                if(message.text.strip() == "/GetPublicURL" and is_admin):
+                    self.NotifyAdmins(admins, 'Javna adresa: \n' + self.public_url)
+                    return Response(status=200)
+                if(message.text.strip() == "/GetLocalIP" and is_admin):
+                    self.NotifyAdmins(admins, 'Lokalna adresa: \n' + socket.gethostbyname(socket.gethostname()))
+                    return Response(status=200)
+                if(message.text.strip() == "/XRebootMe" and is_admin):
+                    self.NotifyAdmins(admins, 'Rebooting...')
+                    self.Reboot()
+                    return Response(status=200)
+                if(message.text.strip() == "/XRestartViberService" and is_admin):
+                    self.NotifyAdmins(admins, 'Restarting Viber service...')
+                    self.RestartViber()
+                    return Response(status=200)
 
                 UserQ = Query()
 
@@ -138,7 +162,17 @@ class ViberWebhook:
     def control(self):
         admins = self.GetAdmins()
         #data = request.get_data().decode('utf8')
-        return Response(status=200, response='Serving Request: ' + request.path)
+        if(request.args.get('command') == 'users'):
+            if(request.args.get('a') == '0'):
+                usersListStr = ""
+                for user in self.usersDb.all():
+                    usersListStr += user['name'] + ';'
+                return Response(status=200, response=usersListStr)
+            else:
+                usersListStr = ""
+                for user in self.usersDb.search(self.query.admin == '1'):
+                    usersListStr += user['name'] + ';'
+                return Response(status=200, response=usersListStr)
 
     def set_webhook(self, viber):
         self.viber.set_webhook(self.public_url)  
